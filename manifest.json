@@ -1,0 +1,14 @@
+{
+	"name": "My First Extension",
+	"version": "1.0",
+	"manifest_version": 2,
+	"description": "The first extension that I made.",
+	"permissions": [
+	  "https://api.imgur.com/2/upload.json"
+	],
+	"content_scripts": [{
+		"matches": ["http://mail.google.com/*", "https://mail.google.com/*"],
+		"js": [ "insert.js", "app.js" ]
+	}],
+	"web_accessible_resources": [ "app.js" ]
+}
