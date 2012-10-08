@@ -1,4 +1,7 @@
 (function(window, document) {
+	var _slice = Array.prototype.slice;
+	var _concat = Array.prototype.concat;
+
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 
 	var $, $upload;
@@ -73,10 +76,10 @@
 		new MutationObserver(function(mutations) {
 			var additions = mutations
 				.filter(function(m) { return m.addedNodes.length > 0; })
-				.map(function(m) { return Array.prototype.slice.call(m.addedNodes, 0); })
+				.map(function(m) { return _slice.call(m.addedNodes, 0); })
 			;
 
-			addUploadButtons(Array.prototype.concat.apply([], additions));
+			addUploadButtons(_concat.apply([], additions));
 		}).observe($chatContainer[0], { childList: true });
 
 		$chatContainer.delegate(".gtu-button-upload", "click", function(e) {
