@@ -12,7 +12,7 @@
 			.append("<br/>")
 			.append("<input type='submit' />")
 			.submit(function() {
-				var files = $("label > input", this)[0].files;
+				var files = $("input:file", this)[0].files;
 
 				var data = new FormData();
 				data.append("image", files[0]);
@@ -39,12 +39,17 @@
 						$upload.dialog("close");
 					}
 				});
+
+				$("input:submit").prop("disabled", true);
 			})
 			.dialog({
 				modal: true,
 				autoOpen: false,
 				title: "Upload a picture",
-				open: function() { $("label > input", this).replaceWith("<input type='file' />"); }
+				open: function() {
+					$("input:file", this).replaceWith("<input type='file' />");
+					$("input:submit", this).prop("disabled", false);
+				}
 			})
 		;
 	}
