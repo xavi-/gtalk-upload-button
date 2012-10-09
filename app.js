@@ -4,6 +4,7 @@
 
 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
 
+	var isPopout = false;
 	var $, $upload;
 
 	function createUploadDialog() {
@@ -54,6 +55,20 @@
 		;
 	}
 
+	function attachButtonDelegatesIfNecessary() {
+		if(attachButtonDelegatesIfNecessary.isAttached) { return; }
+
+		(isPopout ? $(document.body) : $(".dw .no:first-child"))
+			.delegate(".gtu-button-upload", "click", function(e) {
+				e.preventDefault();
+
+				var $msg = $(e.target).closest("table").find("textarea");
+				$upload.data("message-box", $msg).dialog("open");
+			})
+		;
+
+		attachButtonDelegatesIfNecessary.isAttached = true;
+	}
 	function addUploadButtons(elems) {
 		$(elems).find(".gy")
 			.css("position", "relative")
@@ -74,9 +89,11 @@
 					.end()
 			)
 		;
+
+		attachButtonDelegatesIfNecessary();
 	}
 	function attachNewChatObserver() {
-		var $chatContainer = $(".dw .no:first-child");
+		var chatContainer = $(".dw .no:first-child")[0];
 
 		new MutationObserver(function(mutations) {
 			var additions = mutations
@@ -85,14 +102,9 @@
 			;
 
 			addUploadButtons(_concat.apply([], additions));
-		}).observe($chatContainer[0], { childList: true });
+		}).observe(chatContainer, { childList: true });
 
-		$chatContainer.delegate(".gtu-button-upload", "click", function(e) {
-			e.preventDefault();
-
-			var $msg = $(e.target).closest("table").find("textarea");
-			$upload.data("message-box", $msg).dialog("open");
-		}).each(function() { addUploadButtons(this); });
+		addUploadButtons(chatContainer);
 
 		console.log("Attached new chat detector");
 	}
@@ -100,10 +112,13 @@
 	document.getElementById("jqueryui-gtu").addEventListener("load", function() {
 		if(!window.jQuery) { return; }
 
-		$ = window.jQuery.noConflict(true);
+		window.gtu = window.gtu || {};
+		$ = window.gtu.$ = window.jQuery.noConflict(true);
 
-		if($(".dw .no:first-child").length > 0) { attachNewChatObserver(); }
-		else {
+		isPopout = $(document.body).hasClass("xE");
+		if(isPopout) { addUploadButtons($(".gN")); }
+		else if($(".dw .no:first-child").length > 0) { attachNewChatObserver(); }
+		else { // Page not done loading
 			new MutationObserver(function(mutations, obs) {
 				if($(".dw .no:first-child").length <= 0) { return; }
 
