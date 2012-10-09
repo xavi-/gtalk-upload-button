@@ -7,11 +7,13 @@
 
 	var jqueryui = document.createElement("script");
 	jqueryui.id = "jqueryui-gtu";
+	jqueryui.async = true;
 	document.body.appendChild(jqueryui);
 	jqueryui.addEventListener("load", function() { jqueryui.parentNode.removeChild(jqueryui); });
 
 	var jquery = document.createElement("script");
 	jquery.src = "https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.js";
+	jquery.async = true;
 	document.body.appendChild(jquery);
 	jquery.addEventListener("load", function() {
 		jquery.parentNode.removeChild(jquery);
@@ -21,6 +23,7 @@
 
 	var app = document.createElement("script");
 	app.src = chrome.extension.getURL("app.js");
+	app.async = true;
 	document.body.appendChild(app);
 	app.addEventListener("load", function() { app.parentNode.removeChild(app); });
 })();
