@@ -12,8 +12,12 @@
 			.append("<label>File: <input type='file' /></label>")
 			.append("<br/>")
 			.append("<input type='submit' />")
-			.submit(function() {
+			.submit(function(e) {
+				e.preventDefault();
+
 				var files = $("input:file", this)[0].files;
+
+				if(files.length <= 0) { return window.alert("Please upload an image file."); }
 
 				var data = new FormData();
 				data.append("image", files[0]);
@@ -33,9 +37,16 @@
 
 						$upload.dialog("close");
 					},
-					error: function() {
-						console.log("error");
-						window.alert("An error occurred.");
+					error: function(data, status, error) {
+						console.error("Uplaod error -- statue: " + status + "; error: " + error, data);
+
+						var response = JSON.parse(data.responseText);
+						window.alert(
+							"An error occurred.\n" +
+							"Status: " + status + "; error: " + error + "\n\n" +
+							"Response:\n" +
+							JSON.stringify(response, null, "\t")
+						);
 
 						$upload.dialog("close");
 					}
