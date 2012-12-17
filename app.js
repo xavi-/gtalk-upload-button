@@ -73,6 +73,8 @@
 			.delegate(".gtu-button-upload", "click", function(e) {
 				e.preventDefault();
 
+				if(!$upload) { $upload = createUploadDialog();}
+
 				var $msg = $(e.target).closest("table").find("textarea");
 				$upload.data("message-box", $msg).dialog("open");
 			})
@@ -138,7 +140,5 @@
 				obs.disconnect();
 			}).observe(document.body, { childList: true });
 		}
-
-		$upload = createUploadDialog();
 	});
 })(window, document);
