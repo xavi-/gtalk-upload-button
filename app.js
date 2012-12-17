@@ -33,7 +33,7 @@
 					success: function(data) {
 						console.log("success: ", data);
 						var $msg = $upload.data("message-box");
-						$msg.val($msg.val() + data.upload.links.original);
+						$msg.val($msg.val() + data.upload.links.original).focus();
 
 						$upload.dialog("close");
 					},
