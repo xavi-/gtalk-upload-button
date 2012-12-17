@@ -85,7 +85,7 @@
 	function addUploadButtons(elems) {
 		$(elems).find(".gy")
 			.css("position", "relative")
-			.append(
+			.prepend(
 				$("<button><span>⇪</span></button>")
 					.addClass("gtu-button-upload")
 					.css({
