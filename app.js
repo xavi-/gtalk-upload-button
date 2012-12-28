@@ -7,6 +7,25 @@
 	var isPopout = false;
 	var $, $upload;
 
+	function uploadFiles(files, callback) {
+		var data = new FormData();
+		data.append("image", files[0]);
+		data.append("key", "449e0ea885033eea12558ae9ea945b52");
+
+		$.ajax({
+			url: "https://api.imgur.com/2/upload.json",
+			data: data,
+			cache: false,
+			contentType: false,
+			processData: false,
+			type: "POST",
+			success: function(data) { callback(null, data); },
+			error: function(data, status, error) {
+				callback({ data: data, status: status, error: error });
+			}
+		});
+	}
+
 	function createUploadDialog() {
 		return $("<form/>")
 			.append("<label>File: <input type='file' /></label>")
@@ -19,37 +38,24 @@
 
 				if(files.length <= 0) { return window.alert("Please upload an image file."); }
 
-				var data = new FormData();
-				data.append("image", files[0]);
-				data.append("key", "449e0ea885033eea12558ae9ea945b52");
+				uploadFiles(files, function(err, data) {
+					$upload.dialog("close");
 
-				$.ajax({
-					url: "https://api.imgur.com/2/upload.json",
-					data: data,
-					cache: false,
-					contentType: false,
-					processData: false,
-					type: "POST",
-					success: function(data) {
-						console.log("success: ", data);
-						var $msg = $upload.data("message-box");
-						$msg.val($msg.val() + data.upload.links.original).focus();
+					if(err) {
+						console.error("Uplaod error -- statue: " + err.status + "; error: " + err.error, err.data);
 
-						$upload.dialog("close");
-					},
-					error: function(data, status, error) {
-						console.error("Uplaod error -- statue: " + status + "; error: " + error, data);
-
-						var response = JSON.parse(data.responseText);
-						window.alert(
+						var response = JSON.parse(err.data.responseText);
+						return window.alert(
 							"An error occurred.\n" +
-							"Status: " + status + "; error: " + error + "\n\n" +
+							"Status: " + err.status + "; error: " + err.error + "\n\n" +
 							"Response:\n" +
 							JSON.stringify(response, null, "\t")
 						);
-
-						$upload.dialog("close");
 					}
+
+					console.log("success: ", data);
+					var $msg = $upload.data("message-box");
+					$msg.val($msg.val() + data.upload.links.original).focus();
 				});
 
 				$("input:submit").prop("disabled", true);
