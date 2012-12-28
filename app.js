@@ -26,6 +26,18 @@
 		});
 	}
 
+	function showError(err) {
+		console.error("Uplaod error -- statue: " + err.status + "; error: " + err.error, err.data);
+
+		var response = JSON.parse(err.data.responseText);
+		window.alert(
+			"An error occurred.\n" +
+			"Status: " + err.status + "; error: " + err.error + "\n\n" +
+			"Response:\n" +
+			JSON.stringify(response, null, "\t")
+		);
+	}
+
 	function createUploadDialog() {
 		return $("<form/>")
 			.append("<label>File: <input type='file' /></label>")
@@ -41,17 +53,7 @@
 				uploadFiles(files, function(err, data) {
 					$upload.dialog("close");
 
-					if(err) {
-						console.error("Uplaod error -- statue: " + err.status + "; error: " + err.error, err.data);
-
-						var response = JSON.parse(err.data.responseText);
-						return window.alert(
-							"An error occurred.\n" +
-							"Status: " + err.status + "; error: " + err.error + "\n\n" +
-							"Response:\n" +
-							JSON.stringify(response, null, "\t")
-						);
-					}
+					if(err) { return showError(err); }
 
 					console.log("success: ", data);
 					var $msg = $upload.data("message-box");
@@ -88,26 +90,66 @@
 
 		attachButtonDelegatesIfNecessary.isAttached = true;
 	}
-	function addUploadButtons(elems) {
-		$(elems).find(".gy")
-			.css("position", "relative")
-			.prepend(
-				$("<button><span>⇪</span></button>")
-					.addClass("gtu-button-upload")
-					.css({
-						position: "absolute",
-						top: 2,
-						left: 0,
-						width: 15,
-						height: 18,
-						background: "#0FF",
-						padding: 0
-					})
-					.find("span")
-						.css({ position: "relative", "top": -2 })
-					.end()
-			)
+	function createHint() {
+		return $('<div class="gtu-hint">Drop file here</div>')
+			.css({
+				"position": "absolute",
+				"background": "white",
+				"border": "3px dashed #000",
+				"border-radius": 5,
+				"top": 4,
+				"bottom": 3,
+				"left": 3,
+				"right": 3,
+				"font-weight": "bold",
+				"line-height": "175%"
+			})
+			.hide()
+			.bind("dragover", function() { $(this).css({ "border-color": "#7EE" }); })
+			.bind("dragleave", function() { $(this).css({ "border-color": "#000" }); })
 		;
+	}
+	function addUploadButtons(elems) {
+		$(elems)
+			.find(".aep")
+				.css("position", "relative")
+				.append(createHint())
+				.bind("drop", function(e) {
+					e.preventDefault();
+
+					var $table = $(this).closest("table");
+
+					$(".gtu-hint", $table).addClass("gtu-uploading").show().text("Uploading...");
+					uploadFiles(e.originalEvent.dataTransfer.files, function(err, data) {
+						$(".gtu-uploading", $table).removeClass("gtu-uploading").hide().text("Drop file here");
+
+						if(err) { return showError(err); }
+
+						console.log("success: ", data);
+						var $msg = $("textarea", $table);
+						$msg.val($msg.val() + data.upload.links.original).focus();
+					});
+				})
+			.end()
+			.find(".gy")
+				.css("position", "relative")
+				.prepend(
+					$("<button><span>⇪</span></button>")
+						.addClass("gtu-button-upload")
+						.css({
+							position: "absolute",
+							top: 2,
+							left: 0,
+							width: 15,
+							height: 18,
+							background: "#0FF",
+							padding: 0
+						})
+						.find("span")
+							.css({ position: "relative", "top": -2 })
+						.end()
+				)
+			;
 
 		attachButtonDelegatesIfNecessary();
 	}
@@ -142,6 +184,19 @@
 				if($(".dw .no:first-child").length <= 0) { return; }
 
 				attachNewChatObserver();
+				$("body")
+					.bind("dragover dragleave", function(e){
+						e.preventDefault();
+						clearTimeout($(this).data("hide-timeout"));
+					})
+					.bind("dragover", function() { $(".gtu-hint").show(); })
+					.bind("dragleave", function(e) {
+						$(this).data(
+							"hide-timeout",
+							setTimeout(function() { $(".gtu-hint:not(.gtu-uploading)").fadeOut(100); }, 100)
+						);
+					})
+				;
 
 				obs.disconnect();
 			}).observe(document.body, { childList: true });
