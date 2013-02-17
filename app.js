@@ -123,7 +123,12 @@
 
 					$(".gtu-hint", $table).addClass("gtu-uploading").show().text("Uploading...");
 					uploadFiles(e.originalEvent.dataTransfer.files, function(err, data) {
-						$(".gtu-uploading", $table).removeClass("gtu-uploading").hide().text("Drop file here");
+						$(".gtu-uploading", $table)
+							.removeClass("gtu-uploading")
+							.hide()
+							.css({ "border-color": "#000" })
+							.text("Drop file here")
+						;
 
 						if(err) { return showError(err); }
 
