@@ -8,6 +8,8 @@
 	var $, $upload;
 
 	function uploadFiles(files, callback) {
+		if(files.length <= 0) { return callback({ error: "No files to upload." }); }
+
 		var data = new FormData();
 		data.append("image", files[0]);
 		data.append("key", "449e0ea885033eea12558ae9ea945b52");
@@ -29,7 +31,7 @@
 	function showError(err) {
 		console.error("Uplaod error -- statue: " + err.status + "; error: " + err.error, err.data);
 
-		var response = JSON.parse(err.data.responseText);
+		var response = (err.data ? JSON.parse(err.data.responseText) : "No Data");
 		window.alert(
 			"An error occurred.\n" +
 			"Status: " + err.status + "; error: " + err.error + "\n\n" +
