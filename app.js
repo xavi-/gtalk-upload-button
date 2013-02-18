@@ -145,12 +145,14 @@
 						.addClass("gtu-button-upload")
 						.css({
 							position: "absolute",
-							top: 2,
-							left: 0,
-							width: 15,
-							height: 18,
-							background: "#0FF",
-							padding: 0
+							top: 2, left: 1,
+							width: 15, height: 18,
+							background: "transparent",
+							color: "#609BFF",
+							padding: 0, border: "none",
+							cursor: "pointer",
+							"font-size": 15,
+							"user-select": "none"
 						})
 						.find("span")
 							.css({ position: "relative", "top": -2 })
